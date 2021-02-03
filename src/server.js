@@ -22,7 +22,39 @@ io.on('connection', (socket) => {
 	// send message
 	socket.emit('message', `Hello client ${socket.id}`)
 
+	// Room request recieved
+	socket.on('requestRoom', message => 
+	{
+		// create the room, eventually we'll want to actually save this
+		var newRoom = new Room();
+
+		// log it out
+		console.log(`Room request from ${socket.id}: created room ${newRoom.code}`);
+		
+		// and send back a responce
+		socket.emit('sendRoom', newRoom.code);
+
+	})
+
 	socket.on('message', message => 
 		console.log(`Message from ${socket.id}: ${message}`)
 	)
 })
+
+function generateRoomCode(len) {
+	const alphabet = "abcdefghijklmnopqrstuvwxyz"
+  
+	var code = "";
+
+	for(var i = 0; i < len; i++) {
+		code += alphabet[Math.floor(Math.random() * alphabet.length)];
+	}
+	return code
+}
+
+class Room {
+	constructor()
+	{
+		this.code = generateRoomCode(4);
+	}
+}
