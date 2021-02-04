@@ -2,6 +2,7 @@ export default class Room {
 	constructor(id) {
 		this.id = id;
 		this.players = {};
+		this.playerCount = 0;
 	}
 
 	addPlayer(player) {
@@ -10,5 +11,6 @@ export default class Room {
 		}
 
 		this.players[player.name] = player;
+		++this.playerCount;
 	}
 }
