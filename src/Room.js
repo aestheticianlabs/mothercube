@@ -1,14 +1,14 @@
 export default class Room {
 	constructor(id) {
 		this.id = id;
-		this.players = [];
+		this.players = {};
 	}
 
 	addPlayer(player) {
-		if (this.players.includes(player)) {
+		if (this.players[player.name]) {
 			throw new Error(`Players already contains player ${player.name}`);
 		}
 
-		this.players.push(player);
+		this.players[player.name] = player;
 	}
 }
