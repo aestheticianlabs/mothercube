@@ -21,10 +21,6 @@ io.on('connection', (socket) => {
 
 	socket.onAny((eventName) => console.log(`recieved ${eventName}`));
 
-	// send message
-	// TODO: remove debug -ntr
-	socket.emit('message', `Hello client ${socket.id}`);
-
 	// Room request recieved
 	socket.on('requestRoom', () => {
 		/* TODO: handle room requests via web requests instead of socket.io?
@@ -65,7 +61,4 @@ io.on('connection', (socket) => {
 		// and send back a responce
 		socket.emit('sendRoom', newRoom.id);
 	});
-
-	// TODO: remove debug -ntr
-	socket.on('message', (message) => console.log(`Message from ${socket.id}: ${message}`));
 });
