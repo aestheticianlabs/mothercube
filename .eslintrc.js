@@ -18,5 +18,6 @@ module.exports = {
 		'no-console': 0,
 		// allow ++/--
 		'no-plusplus': 0,
+		'import/extensions': 0,
 	},
 };

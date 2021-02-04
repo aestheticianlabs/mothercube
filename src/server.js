@@ -1,28 +1,6 @@
 import express from 'express';
 import { Server } from 'socket.io';
-
-// TODO: could be a static function on Room -ntr
-function generateRoomCode(len) {
-	const alphabet = 'abcdefghijklmnopqrstuvwxyz';
-
-	let code = '';
-
-	for (let i = 0; i < len; i++) {
-		code += alphabet[Math.floor(Math.random() * alphabet.length)];
-	}
-
-	// TODO: verify unique room code -ntr
-	// TODO: no naughty words :^) -ntr
-
-	return code;
-}
-
-// TODO: move to Room.js -ntr
-class Room {
-	constructor() {
-		this.code = generateRoomCode(4);
-	}
-}
+import Rooms from './Rooms.js';
 
 // init web server
 const app = express();
@@ -79,13 +57,13 @@ io.on('connection', (socket) => {
  		*/
 
 		// create the room, eventually we'll want to actually save this
-		const newRoom = new Room();
+		const newRoom = Rooms.create();
 
 		// log it out
-		console.log(`Room request from ${socket.id}: created room ${newRoom.code}`);
+		console.log(`Room request from ${socket.id}: created room ${newRoom.id}`);
 
 		// and send back a responce
-		socket.emit('sendRoom', newRoom.code);
+		socket.emit('sendRoom', newRoom.id);
 	});
 
 	// TODO: remove debug -ntr
