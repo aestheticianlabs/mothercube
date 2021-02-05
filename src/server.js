@@ -47,6 +47,7 @@ io.on('connection', (socket) => {
 		if (query.kind && query.kind === 'host') {
 			// add host to room
 			console.log(`Host is connecting to ${room.id}`);
+			room.host = socket;
 		} else {
 			// add player to room
 			console.log(`Player ${query.name} is connecting to ${room.id}`);
@@ -62,17 +63,31 @@ io.on('connection', (socket) => {
 		socket.emit('room_joined', room);
 	}
 
-	socket.onAny((eventName) => console.log(`recieved ${eventName}`));
+	socket.on('message', (message) => {
+		if (!message.to.kind) {
+			throw new Error('Missing message.to.kind');
+		}
+		if (!message.room) {
+			throw new Error('Missing message.room');
+		}
+		const room = Rooms.get(message.room);
 
-	/* TODO: do we want to use socket.io rooms here?
-	* https://socket.io/docs/v3/rooms/
-	*
-	* We'll probably still need to tell the client what room they're in
-	* because socket.io rooms are server-side only.
-	*
-	* Could we store a UID for the client and keep track of what room the
-	* client is in on the server side?
-	*
-	* -ntr
-	*/
+		switch (message.to.kind) {
+			// sending message to room host
+			case 'host':
+				room.host.emit('message', message);
+				break;
+			// sending message to specific player
+			case 'player':
+				room.getPlayer(message.to.name).socket.emit('message', message);
+				break;
+			// sending message to all players
+			case 'allPlayers':
+				socket.to(room.id).emit('message', message);
+				break;
+			default: throw new Error(`Unexpected message kind: ${message.to.kind}`);
+		}
+	});
+
+	socket.onAny((eventName) => console.log(`recieved ${eventName}`));
 });

@@ -14,6 +14,14 @@ export default class Room {
 		++this.playerCount;
 	}
 
+	getPlayer(name) {
+		if (!this.players[name]) {
+			throw new Error(`Player ${name} does not exist`);
+		}
+
+		return this.players[name];
+	}
+
 	toJSON() {
 		return {
 			id: this.id,

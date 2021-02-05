@@ -13,7 +13,7 @@ module.exports = {
 	rules: {
 		// prefer tabs instead of spaces
 		'no-tabs': 0,
-		indent: ['error', 'tab'],
+		indent: ['error', 'tab', { SwitchCase: 1 }],
 		// allow console.log
 		'no-console': 0,
 		// allow ++/--
