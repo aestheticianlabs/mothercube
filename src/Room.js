@@ -13,4 +13,12 @@ export default class Room {
 		this.players[player.name] = player;
 		++this.playerCount;
 	}
+
+	toJSON() {
+		return {
+			id: this.id,
+			playerCount: this.playerCount,
+			players: this.players,
+		};
+	}
 }

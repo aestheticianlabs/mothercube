@@ -5,7 +5,7 @@ import Player from './Player.js';
 
 // init web server
 const app = express();
-// app.use(express.json()) // parse request data as json
+app.use(express.json()); // parse request data as json
 
 // TODO: we should get the port from the environment rather than hard-code it -ntr
 const server = app.listen(8081, () => {
@@ -38,29 +38,20 @@ io.on('connection', (socket) => {
 	console.log(`connected to ${socket.id}`);
 
 	if (Rooms.exists(query.room)) {
+		// add player to room
 		const room = Rooms.get(query.room);
 		console.log(`Player ${query.name} is connecting to ${room.id}`);
-		room.addPlayer(new Player(socket, query.name));
+
+		// join the room
+		socket.join(room.id);
+		const player = new Player(socket, query.name, room);
+		room.addPlayer(player);
+
+		// notify player joined
+		io.to(room.id).emit('player_joined', player, room);
 	}
 
 	socket.onAny((eventName) => console.log(`recieved ${eventName}`));
-
-	/* TODO: handle room requests via web requests instead of socket.io?
-	* This saves us from connecting to the socket.io server until we have
-	* a room to join (saves server resources).
-	*
-	* The flow could look something like this:
-	*
-	* ✔ host: GET http://game.server/room?game=quiplash
-	* ✔ server: { "id" : "ABCD", "game" : "quiplash" }
-	* ✔ client(s): socket.io connect http://game.server/?room=ABCD&name=Jill
-	* server: *connect client to room from query and associate connection ID with name*
-	*
-	* See detail on connection with query parameters:
-	* https://socket.io/docs/v3/client-api/index.html
-	*
-	* -ntr
-	*/
 
 	/* TODO: do we want to use socket.io rooms here?
 	* https://socket.io/docs/v3/rooms/
