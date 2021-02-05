@@ -82,7 +82,7 @@ io.on('connection', (socket) => {
 				room.getPlayer(message.to.name).socket.emit('message', message);
 				break;
 			// sending message to all players
-			case 'allPlayers':
+			case 'everyone':
 				socket.to(room.id).emit('message', message);
 				break;
 			default: throw new Error(`Unexpected message kind: ${message.to.kind}`);
