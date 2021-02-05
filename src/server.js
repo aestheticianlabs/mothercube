@@ -32,23 +32,34 @@ app.get('/room', (req, resp) => {
 });
 
 io.on('connection', (socket) => {
-	// TODO: get client name from query
 	const { query } = socket.handshake;
 
 	console.log(`connected to ${socket.id}`);
 
 	if (Rooms.exists(query.room)) {
-		// add player to room
+		// get room
 		const room = Rooms.get(query.room);
-		console.log(`Player ${query.name} is connecting to ${room.id}`);
 
 		// join the room
 		socket.join(room.id);
-		const player = new Player(socket, query.name, room);
-		room.addPlayer(player);
 
-		// notify player joined
-		io.to(room.id).emit('player_joined', player, room);
+		// host connection
+		if (query.kind && query.kind === 'host') {
+			// add host to room
+			console.log(`Host is connecting to ${room.id}`);
+		} else {
+			// add player to room
+			console.log(`Player ${query.name} is connecting to ${room.id}`);
+
+			const player = new Player(socket, query.name, room);
+			room.addPlayer(player);
+
+			// notify player joined
+			io.to(room.id).emit('player_joined', player, room);
+		}
+
+		// tell the client they joined the room
+		socket.emit('room_joined', room);
 	}
 
 	socket.onAny((eventName) => console.log(`recieved ${eventName}`));
