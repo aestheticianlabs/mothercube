@@ -7,11 +7,12 @@ export default class Room {
 
 	addPlayer(player) {
 		if (this.players[player.name]) {
-			throw new Error(`Players already contains player ${player.name}`);
+			return false;
 		}
 
 		this.players[player.name] = player;
 		++this.playerCount;
+		return true;
 	}
 
 	getPlayer(name) {

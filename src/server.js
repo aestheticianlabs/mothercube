@@ -40,6 +40,8 @@ io.on('connection', (socket) => {
 		// get room
 		const room = Rooms.get(query.room);
 
+		let success = false;
+
 		// join the room
 		socket.join(room.id);
 
@@ -48,19 +50,20 @@ io.on('connection', (socket) => {
 			// add host to room
 			console.log(`Host is connecting to ${room.id}`);
 			room.host = socket;
+			success = true;
 		} else {
 			// add player to room
 			console.log(`Player ${query.name} is connecting to ${room.id}`);
 
 			const player = new Player(socket, query.name, room);
-			room.addPlayer(player);
+			success = room.addPlayer(player);
 
 			// notify player joined
-			io.to(room.id).emit('player_joined', player, room);
+			if (success) io.to(room.id).emit('player_joined', player, room);
 		}
 
 		// tell the client they joined the room
-		socket.emit('room_joined', room);
+		if (success) socket.emit('room_joined', room);
 	}
 
 	socket.on('message', (message) => {
